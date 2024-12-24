@@ -6,25 +6,6 @@ Este projeto tem como objetivo configurar um servidor Nginx, criar um script de 
 
 ---
 
-## Índice
-
-1. [Requisitos](#requisitos)
-2. [Como Criar um Ambiente Linux no Windows Usando WSL](#como-criar-um-ambiente-linux-no-windows-usando-wsl)
-   - [2.1. Habilitar o WSL](#1-habilitar-o-wsl)
-   - [2.2. Escolher uma Distribuição Linux](#2-escolher-uma-distribuição-linux)
-   - [2.3. Configurar o Ambiente Linux](#3-configurar-o-ambiente-linux)
-   - [2.4. Instalar Dependências](#4-instalar-dependências)
-3. [Etapas do Projeto](#etapas-do-projeto)
-   - [3.1. Configuração do Servidor Nginx](#1-configuração-do-servidor-nginx)
-   - [3.2. Criação do Script de Validação](#2-criação-do-script-de-validação)
-   - [3.3. Configuração do Cron](#3-configuração-do-cron)
-   - [3.4. Versionamento no Git](#4-versionamento-no-git)
-4. [Estrutura Final do Projeto](#estrutura-final-do-projeto)
-5. [Como Executar Manualmente](#como-executar-manualmente)
-6. [Considerações Finais](#considerações-finais)
-
----
-
 ## Requisitos
 
 - Windows 10 ou Windows 11
@@ -33,40 +14,66 @@ Este projeto tem como objetivo configurar um servidor Nginx, criar um script de 
 
 ---
 
-## Como Criar um Ambiente Linux no Windows Usando WSL
+## Requisitos da atividade
+- Utilizar o WSL do Windows e criar um subsistema do Ubuntu 20.04 ou superior. 
+- Subir um servidor Nginx que esteja online e rodando.
+- Criar um script que valide se o serviço está online e enviar o resultado da validação para  um diretório definido pelo usuário.
+- O script deve conter: data e hora, nome do serviço, status e mensagem personalizada de online ou offline.
+- O script deve gerar dois arquivos de saída: um para o serviço online e um para o serviço offline.
+- Preparar a execução automatizada do script a cada 5 minutos.
+
+---
+
+## Índice
+
+
+<ol>
+    <li><a href="#criando-ambiente-linux-no-windows">Criando um ambiente Linux no Windows</a></li>
+    <li><a href="#etapas-projeto">Etapas do Projeto</a></li>
+    <li><a href="#verificar-saida-script">Verificar Saída do Script</a></li>
+    <li><a href="#estrutura-final">Estrutura Final do Projeto</a></li>
+    <li><a href="#consideracoes-finais"> Considerações Finais</a></li>
+</ol>
+
+
+---
+
+
+
+<h2 id="criando-ambiente-linux-no-windows">1. Criando um ambiente Linux no Windows</h2>
 
 O Windows Subsystem for Linux (WSL) permite executar um ambiente Linux diretamente no Windows. Siga os passos abaixo para configurá-lo:
 
-### 1. Habilitar o WSL
+### 1.1 Habilitar o WSL
 Abra o PowerShell como administrador e execute o comando:
 ```bash
 wsl --install
 ```
 Isso instala automaticamente o WSL 2 e a distribuição padrão do Ubuntu.
 
-### 2. Escolher uma Distribuição Linux
+### 1.2 Escolher uma Distribuição Linux
 Instale a distribuição com:
 ```bash
-wsl --install -d <Ubuntu-20.04>
+wsl --install -d Ubuntu-20.04
 ```
 Se quiser outra distribuição, visualize as opções disponíveis:
 ```bash
 wsl --list --online
 ```
 
-### 3. Configurar o Ambiente Linux
+### 1.3 Configurar o Ambiente Linux
 Após a instalação, abra a distribuição Linux pelo menu Iniciar e configure seu usuário e senha.
 
-### 4. Instalar Dependências
+### 1.4 Instalar Dependências
 Dentro do ambiente Linux, atualize os pacotes e instale o que for necessário para o projeto:
 ```bash
 sudo apt update
 sudo apt install nginx git -y
 ```
 
-## Etapas do Projeto
+<h2 id="etapas-projeto">2. Etapas do Projeto</h2>
 
-### 1. Configuração do Servidor Nginx
+### 2.1 Configuração do Servidor Nginx
 
 #### **Instalar o Nginx**
 Execute os comandos abaixo para instalar o Nginx:
@@ -91,7 +98,7 @@ Testar no navegador: Acesse `http://localhost` ou o IP da máquina.
 
 ---
 
-### 2. Criação do Script de Validação
+### 2.2 Criação do Script de Validação
 
 #### **Criar o script `nginx_validacao.sh`**
 O script verifica o status do serviço Nginx e gera logs com as informações relevantes.
@@ -144,7 +151,7 @@ chmod +x nginx_validacao.sh
 
 ---
 
-### 3. Configuração do Cron
+### 2.3 Configuração do Cron
 
 #### **Editar o crontab**
 Configure o cron para executar o script a cada 5 minutos:
@@ -159,7 +166,7 @@ Adicione a linha abaixo:
 
 ---
 
-### 4. Versionamento no Git
+### 2.4 Versionamento no Git
 
 #### **Inicializar o repositório Git**
 ```bash
@@ -178,7 +185,26 @@ git commit -m "Adicionar script de validação do Nginx"
 
 ---
 
-## Estrutura Final do Projeto
+<h2 id="verificar-saida-script">3. Verificar Saída do Script</h2>
+
+#### **Mude para o diretório em que os logs estão localizados**
+```bash
+cd /var/log/nginx_status/online
+```
+
+#### **Liste todos os logs**
+```bash
+ls -l
+```
+
+#### **Visualize a saída do script**
+```bash
+cat <nome_do_arquivo.log>
+```
+
+---
+
+<h2 id="estrutura-final">4. Estrutura Final do Projeto</h2>
 
 - **Script:** `nginx_validacao.sh`
 - **Diretórios de logs:**
@@ -189,12 +215,6 @@ git commit -m "Adicionar script de validação do Nginx"
 
 ---
 
-## Como Executar Manualmente
-Se quiser executar o script sem esperar o cron:
-```bash
-./nginx_validacao.sh
-```
 
----
-## Considerações Finais
+<h2 id="consideracoes-finais">5. Considerações Finais</h2>
 Este projeto implementa a validação e monitoramento do servidor Nginx, criando logs organizados e automatizando a tarefa com cron. Todas as etapas foram versionadas no Git para controle e rastreabilidade.
